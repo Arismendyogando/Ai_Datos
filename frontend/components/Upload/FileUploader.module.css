@@ -1,0 +1,41 @@
+.file-uploader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  background-color: #fafafa;
+  margin: 1rem 0;
+}
+
+.file-uploader-container .MuiButton-root {
+  margin: 0.5rem;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.file-uploader-container .MuiButton-contained {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.file-uploader-container .MuiButton-containedPrimary {
+  background-color: #1976d2;
+}
+
+.file-uploader-container .MuiButton-containedSecondary {
+  background-color: #dc004e;
+}
+
+.file-uploader-container .MuiButton-contained:hover {
+  opacity: 0.9;
+}
+
+.file-uploader-container .MuiTypography-h6 {
+  color: #424242;
+  margin-bottom: 1.5rem;
+}
+
+.file-uploader-container .MuiTypography-body1 {
+  color: #616161;
+}

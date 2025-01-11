@@ -1,0 +1,88 @@
+graph LR
+    subgraph Frontend
+        direction LR
+        App --> MainLayout
+        MainLayout --> HomePage
+        MainLayout --> ProcessingHub
+        MainLayout --> DataEditor
+        MainLayout --> ExportView
+        HomePage -- Route --> App
+        ProcessingHub -- Route --> App
+        DataEditor -- Route --> App
+        ExportView -- Route --> App
+        style App fill:#f9f,stroke:#333,stroke-width:2px
+        style MainLayout fill:#ccf,stroke:#333,stroke-width:2px
+        style HomePage fill:#ddf,stroke:#333,stroke-width:2px
+        style ProcessingHub fill:#ddf,stroke:#333,stroke-width:2px
+        style DataEditor fill:#ddf,stroke:#333,stroke-width:2px
+        style ExportView fill:#ddf,stroke:#333,stroke-width:2px
+        DataEditor --> EditableDataGrid
+        style EditableDataGrid fill:#ddf,stroke:#333,stroke-width:2px
+        ProcessingHub --> FileUploader
+        style FileUploader fill:#ddf,stroke:#333,stroke-width:2px
+    end
+    subgraph Backend
+        direction LR
+        main_py --> config_py
+        main_py --> upload_file
+        invoice_processing -- Folder --> modules
+        base_py -- Module --> invoice_processing
+        factory_py -- Module --> invoice_processing
+        validations_py -- Module --> invoice_processing
+        parsers -- Folder --> invoice_processing
+        excel_parser_py -- Module --> parsers
+        image_parser_py -- Module --> parsers
+        pdf_parser_py -- Module --> parsers
+        utils -- Folder --> invoice_processing
+        logger_py -- Module --> utils
+        validators -- Folder --> invoice_processing
+        invoice_validator_py -- Module --> validators
+        invoice_parser_backup_py -- Service --> services
+        invoice_parser_py -- Service --> services
+        test_api_py -- Test --> tests
+        test_invoice_parser_py -- Test --> tests
+        test_api_integration_py -- Integration Test --> integration
+        style main_py fill:#fcc,stroke:#333,stroke-width:2px
+        style config_py fill:#ccf,stroke:#333,stroke-width:2px
+        style invoice_processing fill:#eef,stroke:#333,stroke-width:2px
+        style base_py fill:#ddf,stroke:#333,stroke-width:2px
+        style factory_py fill:#ddf,stroke:#333,stroke-width:2px
+        style validations_py fill:#ddf,stroke:#333,stroke-width:2px
+        style excel_parser_py fill:#ddf,stroke:#333,stroke-width:2px
+        style image_parser_py fill:#ddf,stroke:#333,stroke-width:2px
+        style pdf_parser_py fill:#ddf,stroke:#333,stroke-width:2px
+        style logger_py fill:#ddf,stroke:#333,stroke-width:2px
+        style invoice_validator_py fill:#ddf,stroke:#333,stroke-width:2px
+        style invoice_parser_backup_py fill:#ddf,stroke:#333,stroke-width:2px
+        style invoice_parser_py fill:#ddf,stroke:#333,stroke-width:2px
+        style test_api_py fill:#ddf,stroke:#333,stroke-width:2px
+        style test_invoice_parser_py fill:#ddf,stroke:#333,stroke-width:2px
+        style test_api_integration_py fill:#ddf,stroke:#333,stroke-width:2px
+    end
+    Frontend -- communicates with --> Backend
+    subgraph Documentation
+        direction LR
+        docs -- Folder --> diagrams
+        diagrams -- Folder --> flow
+        diagrams -- Folder --> assets
+        flow -- File --> project_flow_md[project_flow.md]
+        flow -- File --> ui_flow_md[ui_flow.md]
+        flow -- File --> integrated_flow_md[integrated_flow.md]
+        assets -- File --> project_flow_png[project_flow.png]
+        assets -- File --> ui_flow_png[ui_flow.png]
+        assets -- File --> integrated_flow_png[integrated_flow.png]
+        docs -- File --> README_md[README.md]
+        docs -- File --> ARCHITECTURE_md[ARCHITECTURE.md]
+        style docs fill:#eef,stroke:#333,stroke-width:2px
+        style diagrams fill:#ddf,stroke:#333,stroke-width:2px
+        style flow fill:#ddf,stroke:#333,stroke-width:2px
+        style assets fill:#ddf,stroke:#333,stroke-width:2px
+        style project_flow_md fill:#fff,stroke:#333,stroke-width:1px
+        style ui_flow_md fill:#fff,stroke:#333,stroke-width:1px
+        style integrated_flow_md fill:#fff,stroke:#333,stroke-width:1px
+        style project_flow_png fill:#fff,stroke:#333,stroke-width:1px
+        style ui_flow_png fill:#fff,stroke:#333,stroke-width:1px
+        style integrated_flow_png fill:#fff,stroke:#333,stroke-width:1px
+        style README_md fill:#fff,stroke:#333,stroke-width:1px
+        style ARCHITECTURE_md fill:#fff,stroke:#333,stroke-width:1px
+    end

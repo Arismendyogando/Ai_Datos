@@ -1,0 +1,47 @@
+[MASTER]
+# Python version to use for checking
+python-version=3.10
+
+[MESSAGES CONTROL]
+# Only show warnings with the listed confidence levels
+confidence=
+    HIGH,
+    INFERENCE,
+    INFERENCE_FAILURE,
+    UNDEFINED
+
+# Checks for unused code
+disable=
+    unused-variable,
+    unused-import
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=120
+
+# Maximum number of lines in a module
+max-module-lines=1000
+
+[TYPECHECK]
+# List of decorators that produce context managers
+contextmanager-decorators=
+    contextlib.contextmanager
+
+[VARIABLES]
+# Good variable names which should always be accepted
+good-names=
+    i,
+    j,
+    k,
+    ex,
+    Run,
+    _
+
+[BASIC]
+# Naming style matching correct variable names
+variable-naming-style=snake_case
+const-naming-style=UPPER_CASE
+function-naming-style=snake_case
+method-naming-style=snake_case
+class-naming-style=PascalCase
+module-naming-style=snake_case
