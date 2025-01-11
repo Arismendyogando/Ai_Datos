@@ -1,19 +1,39 @@
 import React, { useState } from 'react';
-import { Button, Typography } from '@mui/material';
+import { 
+  Box, 
+  Button, 
+  Typography,
+  Paper,
+  Stack,
+  FormControlLabel,
+  Checkbox
+} from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import GoogleDriveIcon from '@mui/icons-material/Google';
 import { useAIContext } from '../../context/AIContext';
+import { Document, Page } from 'react-pdf';
 
 const FileUploader = ({ onFileSelect }) => {
+  // Estados
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFields, setSelectedFields] = useState({
+    ruc: true,
+    fecha: true,
+    monto: true,
+    impuesto: true
+  });
   const { setLoading } = useAIContext();
 
-  const handleLocalUpload = (event) => {
-    const file = event.target.files[0];
+  const handleFileSelect = (file) => {
     if (validateFile(file)) {
       setSelectedFile(file);
       onFileSelect(file);
     }
+  };
+
+  const handleLocalUpload = (event) => {
+    const file = event.target.files[0];
+    handleFileSelect(file);
   };
 
   const handleGoogleDriveUpload = async () => {
@@ -21,10 +41,7 @@ const FileUploader = ({ onFileSelect }) => {
       setLoading(true);
       // Implementar integración con Google Drive API
       const file = await selectFromGoogleDrive();
-      if (validateFile(file)) {
-        setSelectedFile(file);
-        onFileSelect(file);
-      }
+      handleFileSelect(file);
     } catch (error) {
       console.error('Error selecting from Google Drive:', error);
     } finally {
@@ -46,51 +63,53 @@ const FileUploader = ({ onFileSelect }) => {
   };
 
   return (
-    <div className="file-uploader-container">
-      <Typography variant="h6" gutterBottom>
-        Seleccione su factura
-      </Typography>
-      
-      <input
-        accept=".pdf,.jpg,.jpeg,.png"
-        style={{ display: 'none' }}
-        id="local-upload"
-        type="file"
-        onChange={handleLocalUpload}
-      />
-      <label htmlFor="local-upload">
-        <Button
-          variant="contained"
-          component="span"
-          startIcon={<CloudUploadIcon />}
-          sx={{ mr: 2 }}
-        >
-          Desde mi computadora
-        </Button>
-      </label>
+    <Paper elevation={3} sx={{ p: 3 }}>
+      <Stack spacing={2}>
+        <Typography variant="h6">Cargar Documento</Typography>
+        
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
+            component="label"
+          >
+            Subir Archivo Local
+            <input type="file" hidden onChange={handleLocalUpload} />
+          </Button>
 
-      <Button
-        variant="contained"
-        color="secondary"
-        startIcon={<GoogleDriveIcon />}
-        onClick={handleGoogleDriveUpload}
-      >
-        Desde Google Drive
-      </Button>
+          <Button
+            variant="outlined"
+            startIcon={<GoogleDriveIcon />}
+            onClick={handleGoogleDriveUpload}
+          >
+            Google Drive
+          </Button>
+        </Box>
 
-      {selectedFile && (
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          Archivo seleccionado: {selectedFile.name}
-        </Typography>
-      )}
-    </div>
+        {selectedFile && (
+          <Stack spacing={1}>
+            <Document file={selectedFile}>
+              <Page pageNumber={1} />
+            </Document>
+            
+            <Box>
+              <FormControlLabel
+                control={<Checkbox checked={selectedFields.ruc} />}
+                label="RUC/ID Fiscal"
+              />
+              <FormControlLabel 
+                control={<Checkbox checked={selectedFields.fecha} />}
+                label="Fecha"
+              />
+            </Box>
+          </Stack>
+        )}
+      </Stack>
+    </Paper>
   );
 };
-
 export default FileUploader;
-
 import { loadGoogleDriveAPI, selectFileFromGoogleDrive } from '../../lib/googleDriveConfig';
-
 // Función para obtener archivo desde Google Drive
 async function selectFromGoogleDrive() {
   try {

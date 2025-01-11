@@ -19,7 +19,7 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 import { google } from 'googleapis';
-import credentials from '../../../config/gcp_credentials/ai-datos@ai-datos.iam.gserviceaccount.com-20250108202111.json';
+import credentials from '@/config/gcp_credentials/ai-datos@ai-datos.iam.gserviceaccount.com-20250108202111.json';
 import useInvoiceStore from '../lib/store';
 
 export default function Export() {

@@ -110,42 +110,29 @@ async def process_file_async(contents: bytes, background_tasks: BackgroundTasks)
 @app.post("/api/upload")
 async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     try:
-        # Validar extensión
-        file_extension = os.path.splitext(file.filename)[1].lower()
-        if file_extension not in Config.ALLOWED_EXTENSIONS:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Formato no soportado. Permitidos: {', '.join(Config.ALLOWED_EXTENSIONS)}"
+        # Read file contents directly
+        contents = await file.read()
+        
+        # Validate file size
+        if len(contents) > Config.MAX_FILE_SIZE:
+            return JSONResponse(
+                content={"error": f"Archivo demasiado grande. Máximo: {Config.MAX_FILE_SIZE / 1024 / 1024}MB"},
+                status_code=400
             )
 
-        # Validar tamaño
-        if file.size > Config.MAX_FILE_SIZE:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Archivo demasiado grande. Máximo: {Config.MAX_FILE_SIZE / 1024 / 1024}MB"
-            )
-
-        # Leer archivo en chunks para archivos grandes
-        chunks = []
-        async for chunk in file.stream():
-            chunks.append(chunk)
-        contents = b''.join(chunks)
-
-        # Procesar archivo
+        # Process with Vision API
         text = await process_file_async(contents, background_tasks)
         
         return JSONResponse(
             content={"text": text},
             status_code=200
         )
-    
     except Exception as e:
         logger.error(f"Error en upload_file: {e}")
         return JSONResponse(
             content={"error": str(e)},
             status_code=500
         )
-
 @app.get("/health")
 async def health_check():
     """Endpoint para verificar salud del servicio"""
@@ -167,3 +154,5 @@ async def global_exception_handler(request, exc):
         content={"error": str(exc)},
         status_code=500
     )
+
+
