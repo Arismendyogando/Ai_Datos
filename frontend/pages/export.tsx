@@ -6,19 +6,21 @@ import { useNotify } from '../hooks/useNotify';
 import ExcelIcon from '@mui/icons-material/Assessment';
 import CloudIcon from '@mui/icons-material/Cloud';
 
-const ExportPage = () => {
+interface ExportPageProps {}
+
+const ExportPage: React.FC<ExportPageProps> = () => {
   const [exportingExcel, setExportingExcel] = useState(false);
   const [exportingSheets, setExportingSheets] = useState(false);
   const notify = useNotify();
 
-  const handleExport = async (type) => {
+  const handleExport = async (type: 'excel' | 'sheets') => {
     const setLoading = type === 'excel' ? setExportingExcel : setExportingSheets;
     setLoading(true);
     
     try {
       await ExportService[`to${type.charAt(0).toUpperCase() + type.slice(1)}`]({});
       notify.success(`Exportación a ${type} exitosa`);
-    } catch (error) {
+    } catch (error: any) {
       notify.error(`Error en exportación a ${type}`);
     } finally {
       setLoading(false);
@@ -50,4 +52,5 @@ const ExportPage = () => {
     </Container>
   );
 };
+
 export default ExportPage;

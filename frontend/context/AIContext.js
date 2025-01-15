@@ -1,36 +1,38 @@
 import { createContext, useContext, useState } from 'react';
+import { DocumentAnalysisService } from '../services/ai/documentService';
 
 const AIContext = createContext();
+const documentService = new DocumentAnalysisService();
 
 export const AIProvider = ({ children }) => {
   const [concepts, setConcepts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [analysisResults, setAnalysisResults] = useState([]);
+  // Añadir manejo de plantillas
+  const [templates, setTemplates] = useState([]);
 
-  const requestAnalysis = async (conceptsArray) => {
+  const analyzeWithTemplate = async (documentId, templateId) => {
+    // Lógica de análisis con plantilla
+  };
+
+  const requestAnalysis = async (document, template) => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // Simular proceso de análisis
-      const processingConcepts = conceptsArray.map(concept => ({
-        name: concept,
-        status: 'Procesando...'
-      }));
+      const result = await documentService.analyzeDocument(document, template);
+      setAnalysisResults(prev => [...prev, result]);
       
-      setConcepts(processingConcepts);
-
-      // Simular tiempo de procesamiento
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      const processedConcepts = processingConcepts.map(concept => ({
+      const processedConcepts = concepts.map(concept => ({
         ...concept,
-        status: 'Completado'
+        status: 'Completed',
+        result: result
       }));
 
       setConcepts(processedConcepts);
     } catch (err) {
-      setError('Error al procesar los conceptos');
+      setError('Error processing document: ' + err.message);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -42,6 +44,7 @@ export const AIProvider = ({ children }) => {
       concepts,
       isLoading,
       error,
+      analysisResults,
       requestAnalysis
     }}>
       {children}
