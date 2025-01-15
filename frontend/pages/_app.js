@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import theme from '../src/theme';
 import { AIProvider } from '../context/AIContext';
+import { SnackbarProvider } from '../context/SnackbarContext';
 
 const DashboardLayout = dynamic(() => import('../components/Layout/DashboardLayout'), {
   loading: () => <div>Cargando...</div>,
@@ -18,21 +19,23 @@ function MyApp({ Component, pageProps }) {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AIProvider>
-        <Suspense fallback={<div>Cargando...</div>}>
-          <DashboardLayout>
-            <Component {...pageProps} />
-          </DashboardLayout>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-            }}
-          />
-        </Suspense>
+        <SnackbarProvider>
+          <Suspense fallback={<div>Cargando...</div>}>
+            <DashboardLayout>
+              <Component {...pageProps} />
+            </DashboardLayout>
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: '#363636',
+                  color: '#fff',
+                },
+              }}
+            />
+          </Suspense>
+        </SnackbarProvider>
       </AIProvider>
     </ThemeProvider>
   );

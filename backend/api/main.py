@@ -1,7 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from typing import List, Dict
+from typing import List, Dict, Any
 import os
 import logging
 from pathlib import Path
@@ -9,6 +9,9 @@ from datetime import datetime
 
 from backend.config import config
 from backend.services.invoice_parser import InvoiceParser
+from backend.services.ai_service import AIService
+from api import export
+from api import documents
 
 # Configuración del logging
 logging.basicConfig(
@@ -32,61 +35,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Inicialización del parser de facturas
+# Inicialización de servicios
 invoice_parser = InvoiceParser()
+ai_service = AIService()
 
-@app.post("/upload", response_model=Dict[str, str])
-async def upload_file(file: UploadFile = File(...)):
+app.include_router(export.router)
+app.include_router(documents.router)
+
+@app.post("/ai/analyze/{document_id}")
+async def analyze_document(document_id: str):
     """
-    Endpoint para subir y procesar un archivo de factura.
-
-    Propósito:
-        Recibe un archivo, lo valida (tipo y tamaño) y lo envía al servicio de procesamiento de facturas.
-
-    Parámetros:
-        - file (UploadFile): El archivo a subir. Se espera que sea un archivo en el formulario 'multipart/form-data'.
-
-    Estructura de la respuesta:
-        - En caso de éxito (código de estado 200):
-            - Retorna un JSON con los datos extraídos de la factura. La estructura exacta depende del contenido de la factura.
-        - En caso de error:
-            - Código de estado 400: Si no se proporciona ningún archivo o el tipo de archivo no está permitido.
-            - Código de estado 413: Si el tamaño del archivo excede el límite permitido.
-            - Código de estado 500: Si ocurre un error durante el procesamiento del archivo.
+    Analiza un documento utilizando el servicio de IA.
     """
-    try:
-        # Validar que se haya proporcionado un archivo
-        if not file.filename:
-            raise HTTPException(status_code=400, detail="No se proporcionó ningún archivo")
-        
-        # Verificar el tipo de archivo
-        file_ext = Path(file.filename).suffix.lower()
-        if file_ext not in config.ALLOWED_FILE_TYPES:
-            raise HTTPException(
-                status_code=400,
-                detail=f"El tipo de archivo {file_ext} no está permitido. Tipos soportados: {', '.join(config.ALLOWED_FILE_TYPES)}"
-            )
-        
-        # Verificar el tamaño del archivo
-        file_size = file.file.seek(0, 2)
-        file.file.seek(0)
-        if file_size > config.max_file_size_bytes:
-            raise HTTPException(
-                status_code=413,
-                detail=f"El tamaño del archivo excede el máximo permitido de {config.MAX_FILE_SIZE_MB}MB"
-            )
-        
-        # Procesar el archivo utilizando el servicio de InvoiceParser
-        logger.info(f"Procesando archivo: {file.filename}")
-        result = await invoice_parser.process_file(file)
-        
-        return JSONResponse(content=result)
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error al procesar el archivo: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Error al procesar el archivo")
+    return ai_service.analyze_document(document_id)
+
+@app.post("/ai/query")
+async def process_query(query: Dict[str, Any], context: Dict[str, Any]):
+    """
+    Procesa una consulta utilizando el servicio de IA.
+    """
+    return ai_service.process_query(query, context)
 
 @app.get("/health")
 async def health_check():
